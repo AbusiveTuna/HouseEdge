@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import Deck, { createDeck } from '../../components/Deck';
 import shuffle from '../../utils/shuffle';
-import calculateResult from '../../utils/handResults';
+import { calculateResult } from '../../utils/handResults';
+import handProbability from '../../utils/handProbability';
 
 export default function LetItRide() {
   let [deck, setDeck] = useState([]);
@@ -10,6 +11,7 @@ export default function LetItRide() {
   let [communityCards, setCommunityCards] = useState([]);
   let [gameState, setGameState] = useState('START');
   let [result, setResult] = useState(null);
+  let [probability, setProbability] = useState(null);
 
   // Shuffle and set the deck when the component mounts
   useEffect( 
@@ -32,7 +34,7 @@ export default function LetItRide() {
   }, [gameState]);
 
   function initializeGame () {
-    const newDeck = shuffle(createDeck());
+    let newDeck = shuffle(createDeck());
     setDeck(newDeck);
   }
 
@@ -44,13 +46,18 @@ export default function LetItRide() {
   function handleGameStateChange () {
     if (gameState === 'HAND_DEALT') {
       //user should be able to pull or let it ride.
+      const dealtHand = deck.slice(0,3);
+      let handProb = handProbability(dealtHand);
+      setProbability(handProb);
     } else if (gameState === 'CC_ONE_DEALT') {
       setCommunityCards(deck.slice(3, 4)); // Show only the first community card
+      const dealtHand = deck.slice(0,4);
+      let handProb = handProbability(dealtHand);
+      setProbability(handProb);
     } else if (gameState === 'CC_TWO_DEALT') {
-      const finalHand = deck.slice(0,3);
       const finalCommunityCards = deck.slice(3,5);
       setCommunityCards(finalCommunityCards); // Show both community cards
-
+      const finalHand = deck.slice(0,3);
       const result = calculateResult(finalHand,finalCommunityCards);
       setResult(result);
     }
@@ -71,27 +78,36 @@ export default function LetItRide() {
     setGameState('START');
     setResult(null);
   }
-
+  
   return (
     <div>
-      <h1>Let It Ride</h1>
-      <h2>Your Hand</h2>
-      <Deck deck={hand} />
-      <h2>Community Cards</h2>
-      <Deck deck={communityCards} />
+      <div className="community-cards">
+        <h2>Community Cards</h2>
+        <Deck deck={communityCards} />
+      </div>
+      <div className="player-hand">
+        <h2>Your Hand</h2>
+        <Deck deck={hand} />
+      </div>
       {result && (
-        <div>
-          <h2>Result</h2>
-          <p>{result}</p> {/* Display the result */}
+        <div className="result-container">
+          <h2 className="result-text">{result}</h2>
         </div>
       )}
       {(gameState === 'HAND_DEALT' || gameState === 'CC_ONE_DEALT') && (
-        <div>
-          <button onClick={() => handleChoice('PULL')}>Pull</button>
-          <button onClick={() => handleChoice('LET_IT_RIDE')}>Let It Ride</button>
+        <div className="probability-container">
+          <h2 className="probability-text">Probability: {probability}</h2>
         </div>
       )}
-      <button onClick={resetGame}>Reset Game</button> { }
+      {(gameState === 'HAND_DEALT' || gameState === 'CC_ONE_DEALT') && (
+        <div className="button-container">
+          <button className="game-button" onClick={() => handleChoice('PULL')}>Pull</button>
+          <button className="game-button" onClick={() => handleChoice('LET_IT_RIDE')}>Let It Ride</button>
+        </div>
+      )}
+      <button className="reset-button" onClick={resetGame}>Reset Game</button> { }
     </div>
-  );
+);
+
+
 }

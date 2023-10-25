@@ -1,4 +1,7 @@
 import '../styles/Card.css';
+import '../styles/Background.css';
+import '../styles/LetItRide.css';
+
 import { Component } from 'react';
 
 class MyApp extends Component {

@@ -16,15 +16,14 @@ export const createDeck = () => {
     return deck;
   };
   
-  const Deck = ({ deck }) => {
+  const Deck = ({ deck, className }) => {
     return (
-      <div className="deck">
+      <div className={`card-container ${className}`}>
         {deck.map((card, index) => (
           <Card key={index} suit={card.suit} value={card.value} />
         ))}
       </div>
     );
   };
-  
 
 export default Deck;

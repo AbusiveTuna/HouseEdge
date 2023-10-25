@@ -1,0 +1,54 @@
+.button-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .reset-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .game-button, .reset-button {
+    font-size: 1.5em;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+  }
+  
+  .game-button {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .reset-button {
+    background-color: #f44336; 
+    color: white; 
+  }
+
+  .probability-container {
+    position: absolute;
+    top: 50%;
+    right: 0;
+  }
+  
+  .probability-text {
+    font-size: 1.5em;
+    color: #FFD700;
+  }
+
+.result-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  
+  .result-text {
+    font-size: 6em;
+    color: #FFD700; 
+    text-shadow: 2px 2px black; 
+  }
+  

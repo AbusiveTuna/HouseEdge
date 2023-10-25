@@ -11,22 +11,13 @@ const orderSuit = {
 
 function calculateResult(playerHand,communityCards) {
     let finalHand = playerHand;
-    for (let index in communityCards){
-        finalHand.push(communityCards[index]);
+
+    if(communityCards != null){
+        for (let index in communityCards){
+            finalHand.push(communityCards[index]);
+        }
     }
 
-    // //test finalHand
-    // finalHand[0].suit = "clubs"
-    // finalHand[0].value = "10";
-    // finalHand[1].suit = "clubs"
-    // finalHand[1].value = "J";
-    // finalHand[2].suit = "diamonds"
-    // finalHand[2].value = "Q";
-    // finalHand[3].suit = "clubs"
-    // finalHand[3].value = "A";
-    // finalHand[4].suit = "clubs"
-    // finalHand[4].value = "9";
-    
     finalHand.sort((a, b) => {
         if(orderValue[a.value] === orderValue[b.value]) {
             return orderSuit[a.suit] - orderSuit[b.suit];
@@ -70,54 +61,79 @@ function checkFlush(hand){
 }
 
 function checkStraight(hand){
-    let values = hand.map(card => orderValue[card.value]);
-    values.sort((a, b) => b - a);
-  
-    // Check if values are sequential
-    for(let i = 0; i < values.length - 1; i++) {
+  let values = hand.map(card => orderValue[card.value]);
+  values.sort((a, b) => b - a);
+
+  // Check if values are sequential
+  for(let i = 0; i < values.length - 1; i++) {
       if(values[i] - values[i + 1] !== 1) {
-        // Special case: Ace can also be a "1"
-        if(!(values[i] === 14 && values[i + 1] === 2)) {
-          return false;
-        }
+          // Special case: Ace can also be a "1"
+          if(!(values[i] === 14 && values[i + 1] === 2)) {
+              // If initial check fails, check for A,2,3,4,5 straight
+              if(values.includes(14)) {
+                  values[values.indexOf(14)] = 1; // Replace Ace value from 14 to 1
+                  values.sort((a, b) => b - a); // Sort the array again
+                  for(let i = 0; i < values.length - 1; i++) {
+                      if(values[i] - values[i + 1] !== 1) {
+                          return false;
+                      }
+                  }
+                  return true;
+              }
+              return false;
+          }
       }
-    }
-  
-    return true;
-}
-
-function checkMultiples(hand) {
-    let counts = {};
-  
-    // Count the occurrences of each value
-    for(let i = 0; i < hand.length; i++) {
-      let value = hand[i].value;
-      if(counts[value]) {
-        counts[value]++;
-      } else {
-        counts[value] = 1;
-      }
-    }
-  
-    // Find the highest count
-    let maxCount = 1;
-    for(let value in counts) {
-      if(counts[value] > maxCount) {
-        maxCount = counts[value];
-      }
-    }
-
-    if(maxCount == 4){
-        return "four of a kind";
-    }
-    else if(maxCount == 3){
-        return "3 of a kind or full house";
-    }
-    else if(maxCount == 2){
-        return "pair or 2 pair";
-    }
-  
-    return "nothing"
   }
 
-export default calculateResult;
+  return true;
+}
+
+
+function checkMultiples(hand) {
+  let counts = {};
+
+  // Count the occurrences of each value
+  for(let i = 0; i < hand.length; i++) {
+      let value = hand[i].value;
+      if(counts[value]) {
+          counts[value]++;
+      } else {
+          counts[value] = 1;
+      }
+  }
+
+  // Find the highest count
+  let maxCount = 1;
+  let maxCountValue = null;
+  for(let value in counts) {
+      if(counts[value] > maxCount) {
+          maxCount = counts[value];
+          maxCountValue = value;
+      }
+  }
+
+  // Remove cards that made up the maxCount
+  if(maxCount >= 2 && maxCount <= 3) {
+      let newHand = hand.filter(card => card.value != maxCountValue);
+      let result = checkMultiples(newHand);
+      
+      if(result == "pair" && maxCount == 3){
+          return "full house";
+      } else if(result == "pair" && maxCount == 2){
+          return "2 pair";
+      } else if(maxCount == 3){
+          return "3 of a kind";
+      } else if(maxCount == 2){
+          return "pair";
+      }
+  }
+
+  if(maxCount == 4){
+      return "four of a kind";
+  }
+
+  return "nothing"
+}
+
+
+export { calculateResult, checkFlush, checkMultiples };
