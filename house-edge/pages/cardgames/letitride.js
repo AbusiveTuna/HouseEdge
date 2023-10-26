@@ -5,6 +5,7 @@ import shuffle from '../../utils/shuffle';
 import { calculateResult } from '../../utils/handResults';
 import handProbability from '../../utils/handProbability';
 import { calculateWin } from '../../utils/payTable';
+import { createSearchParamsBailoutProxy } from 'next/dist/client/components/searchparams-bailout-proxy';
 
 export default function LetItRide() {
   let [deck, setDeck] = useState([]);
@@ -15,67 +16,82 @@ export default function LetItRide() {
   let [probability, setProbability] = useState(null);
   let [handBet, setHandBet] = useState(null);
   let [bonusBet, setBonusBet] = useState(null);
+  let [remainingBet, setRemainingBet] = useState(null);
+  let [isDealt, setIsDealt] = useState(false);
 
   // Shuffle and set the deck when the component mounts
-  useEffect( 
-    function initalizeStart(){
+  useEffect(
+    function initalizeStart() {
       initializeGame();
     }, []);
 
   // Start the game once the deck is set
   useEffect(
     function startOnDeckSet() {
-    if (deck.length > 0) {
-      startGame();
-    }
-  }, [deck]);
+      if (deck.length > 0) {
+        startGame();
+      }
+    }, [deck]);
 
   // Handle game state changes
   useEffect(
     function handleStateChange() {
-    handleGameStateChange();
-  }, [gameState]);
+      handleGameStateChange();
+    }, [gameState]);
 
-  function initializeGame () {
+  function initializeGame() {
     let newDeck = shuffle(createDeck());
     setDeck(newDeck);
   }
 
-  function startGame () {
-    setHand(deck.slice(0, 3));
-    setGameState('HAND_DEALT');
+  function startGame() {
+    setHandBet(15);
+    setBonusBet(5);
+    setIsDealt(false);
   }
 
-  function handleGameStateChange () {
+  function dealHand() {
+    setHand(deck.slice(0, 3));
+    setGameState('HAND_DEALT');
+    setIsDealt(true);
+    setRemainingBet(handBet);
+  }
+
+  function handleGameStateChange() {
     if (gameState === 'HAND_DEALT') {
       //user should be able to pull or let it ride.
-      const dealtHand = deck.slice(0,3);
+      const dealtHand = deck.slice(0, 3);
       let handProb = handProbability(dealtHand);
       setProbability(handProb);
     } else if (gameState === 'CC_ONE_DEALT') {
       setCommunityCards(deck.slice(3, 4)); // Show only the first community card
-      const dealtHand = deck.slice(0,4);
+      const dealtHand = deck.slice(0, 4);
       let handProb = handProbability(dealtHand);
       setProbability(handProb);
     } else if (gameState === 'CC_TWO_DEALT') {
-      const finalCommunityCards = deck.slice(3,5);
+      const finalCommunityCards = deck.slice(3, 5);
       setCommunityCards(finalCommunityCards); // Show both community cards
-      const finalHand = deck.slice(0,3);
-      const result = calculateResult(finalHand,finalCommunityCards);
-      let winnings = calculateWin(result,handBet);
-      let bonusWinnings = calculateWin(deck.slice(0,3), bonusBet);
+      const finalHand = deck.slice(0, 3);
+      const result = calculateResult(finalHand, finalCommunityCards);
+      let winnings = calculateWin(result, remainingBet);
+      let bonusWinnings = calculateWin(deck.slice(0, 3), bonusBet);
       let resultString = result + " You won $" + winnings;
       setResult(resultString);
     }
   }
 
-  function handleChoice (choice) {
-    if (gameState === 'HAND_DEALT') {
-      setGameState('CC_ONE_DEALT');
-    } else if (gameState === 'CC_ONE_DEALT') {
-      setGameState('CC_TWO_DEALT');
+  function handleChoice(choice) {
+    if (choice === 'PULL') {
+        setRemainingBet(remainingBet - (handBet * 1 / 3));
     }
-  }
+    console.log("REMAINING BET");
+    console.log(remainingBet);
+    if (gameState === 'HAND_DEALT') {
+        setGameState('CC_ONE_DEALT');
+    } else if (gameState === 'CC_ONE_DEALT') {
+        setGameState('CC_TWO_DEALT');
+    }
+}
 
   function resetGame() {
     initializeGame();
@@ -83,8 +99,11 @@ export default function LetItRide() {
     setCommunityCards([]);
     setGameState('START');
     setResult(null);
+    setIsDealt(false);
+    setBonusBet(0);
+    setHandBet(0);
   }
-  
+
   return (
     <div>
       <div className="community-cards">
@@ -111,9 +130,13 @@ export default function LetItRide() {
           <button className="game-button" onClick={() => handleChoice('LET_IT_RIDE')}>Let It Ride</button>
         </div>
       )}
-      <button className="reset-button" onClick={resetGame}>Reset Game</button> { }
+      {!isDealt && (
+        <button className="deal-button" onClick={dealHand}>Deal</button>
+      )}
+      {isDealt && (
+        <button className="reset-button" onClick={resetGame}>Reset Game</button>
+      )}
     </div>
-);
-
+  );
 
 }

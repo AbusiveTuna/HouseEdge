@@ -52,3 +52,12 @@
   color: #FFD700;
   text-shadow: 2px 2px black;
 }
+
+.deal-button {
+  font-size: 2em;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+  background-color: #008CBA; 
+  color: white;
+}
