@@ -1,11 +1,9 @@
-// pages/LetItRide.js
 import React, { useEffect, useState } from 'react';
 import Deck, { createDeck } from '../../components/Deck';
 import shuffle from '../../utils/shuffle';
 import { calculateResult } from '../../utils/handResults';
 import handProbability from '../../utils/handProbability';
 import { calculateWin } from '../../utils/payTable';
-import { createSearchParamsBailoutProxy } from 'next/dist/client/components/searchparams-bailout-proxy';
 
 export default function LetItRide() {
   let [deck, setDeck] = useState([]);
