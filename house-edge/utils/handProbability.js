@@ -13,43 +13,42 @@ const orderValue = {
     'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10,
     '9': 9, '8': 8, '7': 7, '6': 6, '5': 5,
     '4': 4, '3': 3, '2': 2
-  };
-  
+};
+
 const orderSuit = {
     'clubs': 4, 'diamonds': 3, 'hearts': 2, 'spades': 1
 };
 
-function handProbability(hand){
+function handProbability(hand) {
 
     //indepth strategy needs to be posted here basically.
     let cardsDealt = hand.length;
 
     let multiples = checkMultiples(hand);
-    if(multiples != "nothing"){
+    if (multiples != "Nothing") {
         return multiples;
     }
-    else if(checkFlush(hand)){
-        if(checkRoyalDraw(hand)){
+    else if (checkFlush(hand)) {
+        if (checkRoyalDraw(hand)) {
             return "Royal Flush Draw";
         }
-        else if(checkStraightDraw(hand)){
+        else if (checkStraightDraw(hand)) {
             return "Straight Flush Draw";
         }
-        else{
+        else {
             return "Flush Draw";
         }
     }
-    else if(checkStraightDraw(hand)){
+    else if (checkStraightDraw(hand)) {
         return "Straight Draw";
     }
-    else{
+    else {
         return "Pull";
     }
-    
 
 }
 
-function checkRoyalDraw(currentHand){
+function checkRoyalDraw(currentHand) {
     const highCards = ['A', 'K', 'Q', 'J', '10'];
     return currentHand.every(card => highCards.includes(card.value));
 }
@@ -71,8 +70,5 @@ function checkStraightDraw(currentHand) {
 
     return isStraightDraw;
 }
-
-
-
 
 export default handProbability;

@@ -4,7 +4,8 @@
   justify-content: space-around;
 }
 
-.player-hand, .community-cards {
+.player-hand,
+.community-cards {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -39,6 +40,5 @@
 h2 {
   font-size: 3em;
   color: #FFD700;
-  text-shadow: 2px 2px black; 
+  text-shadow: 2px 2px black;
 }
-

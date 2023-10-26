@@ -4,6 +4,7 @@ import Deck, { createDeck } from '../../components/Deck';
 import shuffle from '../../utils/shuffle';
 import { calculateResult } from '../../utils/handResults';
 import handProbability from '../../utils/handProbability';
+import { calculateWin } from '../../utils/payTable';
 
 export default function LetItRide() {
   let [deck, setDeck] = useState([]);
@@ -12,6 +13,8 @@ export default function LetItRide() {
   let [gameState, setGameState] = useState('START');
   let [result, setResult] = useState(null);
   let [probability, setProbability] = useState(null);
+  let [handBet, setHandBet] = useState(null);
+  let [bonusBet, setBonusBet] = useState(null);
 
   // Shuffle and set the deck when the component mounts
   useEffect( 
@@ -59,7 +62,10 @@ export default function LetItRide() {
       setCommunityCards(finalCommunityCards); // Show both community cards
       const finalHand = deck.slice(0,3);
       const result = calculateResult(finalHand,finalCommunityCards);
-      setResult(result);
+      let winnings = calculateWin(result,handBet);
+      let bonusWinnings = calculateWin(deck.slice(0,3), bonusBet);
+      let resultString = result + " You won $" + winnings;
+      setResult(resultString);
     }
   }
 
